@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Belot Club – Classic</title>
+  <style>
+    :root { --bg: #1A1A2E; --gold: #FFD700; --blue: #00D9FF; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: #FFF; font-family: system-ui; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 24px; }
+    h1 { font-size: 32px; color: var(--gold); margin-bottom: 24px; }
+    .btn { background: var(--gold); color: #000; padding: 16px; border-radius: 16px; font-weight: bold; font-size: 20px; text-align: center; margin: 16px 0; cursor: pointer; transition: all 0.2s; }
+    .btn:active { transform: scale(1.05); box-shadow: 0 0 20px var(--gold); }
+    .section { background: #16213E; padding: 16px; border-radius: 12px; margin: 8px 0; width: 100%; max-width: 342px; }
+    .avatar { width: 48px; height: 48px; background: var(--blue); border-radius: 50%; display: inline-block; }
+    .footer { margin-top: auto; font-size: 12px; color: #888; }
+  </style>
+</head>
+<body>
+  <h1>Белот Клуб</h1>
+  <div class="btn" onclick="alert('Match in <1s!')">БЪРЗА ИГРА</div>
+  <div class="section"><span class="avatar"></span> Приятели (3 онлайн)</div>
+  <div class="section">КЛУБОВЕ</div>
+  <div class="section">ДНЕВЕН БОНУС +300 монети</div>
+  <div class="footer">Ad-Free • 120 FPS</div>
+  <script>
+    const btn = document.querySelector('.btn');
+    let scale = 1;
+    function pulse() { scale = scale === 1 ? 1.03 : 1; btn.style.transform = `scale(${scale})`; requestAnimationFrame(pulse); }
+    pulse();
+  </script>
+</body>
+</html>

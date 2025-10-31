@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Belot Club – Minimal</title>
+  <style>
+    body { background: #121212; color: #FFF; font-family: system-ui; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 32px; text-align: center; }
+    h1 { font-size: 28px; margin-bottom: 32px; }
+    .btn { background: #1E88E5; padding: 20px; border-radius: 50px; font-size: 22px; width: 300px; }
+    .or { margin: 20px 0; color: #666; }
+    .links { display: flex; justify-content: space-around; width: 100%; max-width: 300px; margin: 20px 0; }
+    .coin { position: fixed; bottom: 20px; right: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Belot Club</h1>
+  <div class="btn" onclick="fanCards()">PLAY NOW</div>
+  <div class="or">OR</div>
+  <div class="links">
+    <div>👥 Friends</div>
+    <div>🏆 Clubs</div>
+    <div>🎁 Bonus</div>
+  </div>
+  <div class="coin">💰 1,000</div>
+  <script>
+    function fanCards() {
+      const cards = ['🂡','🂱','🃁','🃑'];
+      alert('Cards: ' + cards.join(' '));
+    }
+  </script>
+</body>
+</html>
