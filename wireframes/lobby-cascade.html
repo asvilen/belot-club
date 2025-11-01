@@ -39,7 +39,13 @@
       color: transparent;
       font-weight: 900;
     }
-    .card-stack { position: relative; height: 180px; margin: 1rem 0; }
+
+    .card-stack {
+      position: relative;
+      height: 200px;
+      margin: 1rem 0;
+    }
+
     .card {
       width: clamp(60px, 12vw, 100px);
       height: calc(1.45 * clamp(60px, 12vw, 100px));
@@ -47,8 +53,6 @@
       border: 3px solid var(--gold);
       border-radius: 12px;
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
       box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
@@ -61,98 +65,19 @@
       transition: transform 0.2s;
     }
     .card:active { cursor: grabbing; }
-    .card:hover { transform: translate(-50%, -50%) scale(1.05); z-index: 10; }
+    .card:hover { z-index: 10; }
+
     .suit { font-size: clamp(32px, 8vw, 48px); }
     .rank { font-size: clamp(14px, 4vw, 18px); margin-top: -8px; }
     .spades, .clubs { color: black; }
     .hearts, .diamonds { color: var(--red); }
 
-    .btn {
-      background: var(--gold);
-      color: #000;
-      font-weight: 900;
-      font-size: clamp(18px, 5vw, 22px);
-      padding: 16px;
-      border-radius: 16px;
-      margin: 1rem 0;
-      box-shadow: 0 6px 16px rgba(255,215,0,0.4);
-      cursor: pointer;
-    }
-    .btn:active { transform: scale(1.05); }
+    /* FLY-IN FROM CORNERS → FAN */
+    .card:nth-child(1) { top: 0; left: 0; animation: fly1 0.6s ease-out forwards; }
+    .card:nth-child(2) { top: 0; right: 0; animation: fly2 0.6s ease-out forwards; }
+    .card:nth-child(3) { bottom: 0; left: 0; animation: fly3 0.6s ease-out forwards; }
+    .card:nth-child(4) { bottom: 0; right: 0; animation: fly4 0.6s ease-out forwards; }
 
-    .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .badge {
-      background: rgba(0,217,255,0.2);
-      border: 1px solid var(--blue);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: clamp(12px, 3vw, 14px);
-    }
-    .learn { background: #4CAF50; padding: 14px; border-radius: 12px; margin: 1rem 0; font-weight: bold; }
-    .footer { font-size: clamp(11px, 2.5vw, 13px); opacity: 0.7; }
-  </style>
-</head>
-<body>
-  <div class="lobby">
-    <div>
-      <h1>БЕЛОТ КЛУБ</h1>
-
-      <div class="card-stack">
-        <div class="card" draggable="true"><div class="suit spades">♠</div><div class="rank">A</div></div>
-        <div class="card" draggable="true"><div class="suit hearts">♥</div><div class="rank">K</div></div>
-        <div class="card" draggable="true"><div class="suit diamonds">♦</div><div class="rank">Q</div></div>
-        <div class="card" draggable="true"><div class="suit clubs">♣</div><div class="rank">J</div></div>
-      </div>
-
-      <div class="btn" onclick="alert('Започва мач...')">НОВА ИГРА</div>
-
-      <div class="badges">
-        <div class="badge">Приятели</div>
-        <div class="badge">Клубове</div>
-        <div class="badge">Турнири</div>
-      </div>
-
-      <div class="learn">Научи нещо ново → +300 монети</div>
-    </div>
-
-    <div class="footer">Ad-Free • 120 FPS • Learn & Earn</div>
-  </div>
-
-  <script>
-    // DRAG LOGIC – Simple & Smooth
-    document.querySelectorAll('.card').forEach(card => {
-      let isDragging = false;
-      let startX, startY, offsetX = 0, offsetY = 0;
-
-      const onDown = (e) => {
-        isDragging = true;
-        const touch = e.type === 'touchstart' ? e.touches[0] : e;
-        startX = touch.clientX;
-        startY = touch.clientY;
-        const rect = card.getBoundingClientRect();
-        offsetX = startX - rect.left - rect.width / 2;
-        offsetY = startY - rect.top - rect.height / 2;
-        card.style.zIndex = 100;
-      };
-
-      const onMove = (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const touch = e.type === 'touchmove' ? e.touches[0] : e;
-        const x = touch.clientX - offsetX;
-        const y = touch.clientY - offsetY;
-        card.style.transform = `translate(${x}px, ${y}px)`;
-      };
-
-      const onUp = () => {
-        isDragging = false;
-        card.style.zIndex = '';
-      };
-
-      card.addEventListener('mousedown', onDown);
-      card.addEventListener('touchstart', onDown);
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('touchmove', onMove);
-      document.addEventListener('mouseup', onUp);
-      document.addEventListener('touchend', onUp);
-   
+    @keyframes fly1 { to { top: 50%; left: 25%; transform: translate(-50%, -50%) rotate(-15deg); } }
+    @keyframes fly2 { to { top: 50%; right: 25%; transform: translate(50%, -50%) rotate(15deg); } }
+    @keyframes fly
