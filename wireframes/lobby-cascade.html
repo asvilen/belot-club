@@ -4,106 +4,142 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Belot Club – Lobby Cascade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --gold: #FFD700;
       --blue: #00D9FF;
+      --red: #D32F2F;
       --dark: #0F0F1A;
-      --card-w: 80px;
-      --card-h: 116px;
+      --card-w: clamp(60px, 12vw, 100px);
+      --card-h: calc(var(--card-w) * 1.45);
     }
+    * { box-sizing: border-box; }
     body { 
       margin: 0; 
       background: var(--dark); 
       font-family: 'Inter', sans-serif; 
       color: white; 
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       overflow: hidden;
-      touch-action: manipulation;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
     .lobby { 
-      max-width: 390px; 
-      margin: 0 auto; 
-      padding: 24px; 
-      height: 100vh; 
+      width: 100%;
+      max-width: 420px;
+      padding: clamp(16px, 5vw, 32px);
       display: flex; 
       flex-direction: column; 
       justify-content: space-between;
+      height: 100vh;
       position: relative;
     }
     h1 { 
-      font-size: 36px; 
+      font-size: clamp(28px, 8vw, 40px); 
       background: linear-gradient(90deg, var(--gold), var(--blue)); 
       -webkit-background-clip: text; 
       color: transparent; 
       text-align: center;
+      font-weight: 900;
+      margin: 0 0 1rem;
     }
-    .btn {
-      background: var(--gold);
-      color: #000;
-      font-weight: bold;
-      font-size: 20px;
-      padding: 16px;
-      border-radius: 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(255,215,0,0.3);
-    }
-    .btn:active { transform: scale(1.05); }
 
-    /* CARD ANIMATION */
+    /* CARD CONTAINER */
+    .card-stack {
+      position: relative;
+      height: 180px;
+      margin: 1rem 0;
+      perspective: 1000px;
+    }
+
+    /* INDIVIDUAL CARD */
     .card {
       width: var(--card-w);
       height: var(--card-h);
       background: white;
-      border-radius: 8px;
+      border-radius: 12px;
       position: absolute;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
-      font-size: 32px;
+      align-items: center;
+      font-size: clamp(24px, 6vw, 36px);
       font-weight: bold;
       will-change: transform;
-      animation: flyIn 0.4s ease-out forwards;
+      contain: layout style paint;
+      transition: transform 0.2s ease;
+      border: 3px solid var(--gold);
     }
-    .card:nth-child(1) { animation-delay: 0.1s; top: -100px; left: 50px; }
-    .card:nth-child(2) { animation-delay: 0.15s; top: -100px; right: 50px; }
-    .card:nth-child(3) { animation-delay: 0.2s; bottom: -100px; left: 50px; }
-    .card:nth-child(4) { animation-delay: 0.25s; bottom: -100px; right: 50px; }
+    .card:hover { transform: translateY(-8px) scale(1.05); z-index: 10; }
 
-    @keyframes flyIn {
-      to { 
-        transform: translateY(0) rotate(0); 
-        top: 50%; 
-        left: 50%; 
-        margin-left: calc(-var(--card-w) * 1.8); 
-        margin-top: -60px;
-      }
+    /* SUIT STYLING */
+    .suit { font-size: clamp(32px, 8vw, 48px); }
+    .spades, .clubs { color: black; }
+    .hearts, .diamonds { color: var(--red); }
+    .rank { font-size: clamp(14px, 4vw, 18px); margin-top: -8px; }
+
+    /* FAN POSITIONS */
+    .card:nth-child(1) { top: 10%; left: 10%; animation: fly1 0.5s ease-out forwards; }
+    .card:nth-child(2) { top: 10%; right: 10%; animation: fly2 0.5s ease-out forwards; }
+    .card:nth-child(3) { bottom: 10%; left: 10%; animation: fly3 0.5s ease-out forwards; }
+    .card:nth-child(4) { bottom: 10%; right: 10%; animation: fly4 0.5s ease-out forwards; }
+
+    @keyframes fly1 { to { top: 50%; left: 50%; transform: translate(-150%, -50%) rotate(-15deg); } }
+    @keyframes fly2 { to { top: 50%; right: 50%; transform: translate(50%, -50%) rotate(15deg); } }
+    @keyframes fly3 { to { bottom: 50%; left: 50%; transform: translate(-150%, 50%) rotate(15deg); } }
+    @keyframes fly4 { to { bottom: 50%; right: 50%; transform: translate(50%, 50%) rotate(-15deg); } }
+
+    /* BUTTON */
+    .btn {
+      background: var(--gold);
+      color: #000;
+      font-weight: 900;
+      font-size: clamp(18px, 5vw, 22px);
+      padding: 16px;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(255,215,0,0.4);
+      transition: all 0.2s ease;
+      margin: 1rem 0;
     }
+    .btn:active { transform: scale(1.05); }
 
-    /* SUIT COLORS */
-    .spades { color: black; }
-    .hearts, .diamonds { color: #D32F2F; }
-    .clubs { color: black; }
-
+    /* BADGES */
+    .badges {
+      display: flex; 
+      gap: 12px; 
+      justify-content: center; 
+      flex-wrap: wrap;
+    }
     .badge {
       background: rgba(0,217,255,0.2);
       border: 1px solid var(--blue);
       padding: 8px 16px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: clamp(12px, 3vw, 14px);
       animation: pulse 2s infinite;
     }
     @keyframes pulse { 50% { opacity: 0.7; } }
 
     .learn-banner {
       background: linear-gradient(45deg, #1B5E20, #4CAF50);
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       text-align: center;
-      font-size: 14px;
-      margin-top: 16px;
+      font-size: clamp(13px, 3.5vw, 15px);
+      margin: 1rem 0;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center; 
+      font-size: clamp(11px, 2.5vw, 13px); 
+      opacity: 0.7;
     }
   </style>
 </head>
@@ -112,21 +148,32 @@
     <div>
       <h1>БЕЛОТ КЛУБ</h1>
 
-      <!-- Flying Cards -->
-      <div class="card spades">♠ A</div>
-      <div class="card hearts">♥ K</div>
-      <div class="card diamonds">♦ Q</div>
-      <div class="card clubs">♣ J</div>
+      <!-- CARD STACK -->
+      <div class="card-stack">
+        <div class="card"><div class="suit spades">♠</div><div class="rank">A</div></div>
+        <div class="card"><div class="suit hearts">♥</div><div class="rank">K</div></div>
+        <div class="card"><div class="suit diamonds">♦</div><div class="rank">Q</div></div>
+        <div class="card"><div class="suit clubs">♣</div><div class="rank">J</div></div>
+      </div>
 
-      <div class="btn" onclick="alert('Match starting...')">
+      <div class="btn" onclick="alert('Започва мач...')">
         НОВА ИГРА
       </div>
 
-      <div style="display:flex; gap:12px; margin:16px 0; justify-content:center;">
+      <div class="badges">
         <div class="badge">Приятели</div>
         <div class="badge">Клубове</div>
         <div class="badge">Турнири</div>
       </div>
 
       <div class="learn-banner">
-        Научи нещо ново
+        Научи нещо ново → +300 монети
+      </div>
+    </div>
+
+    <div class="footer">
+      Ad-Free • 120 FPS • Learn & Earn
+    </div>
+  </div>
+</body>
+</html>
