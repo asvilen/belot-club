@@ -25,7 +25,7 @@
       padding: clamp(16px, 4vw, 32px);
       gap: 1.5rem;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
 
     h1 {
@@ -82,9 +82,10 @@
     }
 
     .card-container {
-      position: absolute;
+      position: fixed;
       inset: 0;
       pointer-events: none;
+      z-index: 1;
     }
     .card {
       position: absolute;
@@ -100,8 +101,6 @@
       box-shadow: 0 8px 20px rgba(0,0,0,.4);
       user-select: none;
       pointer-events: auto;
-      z-index: 5;
-      transform: translateY(-200vh) rotate(0deg);
       opacity: 0;
     }
     .card.red { color: #C00; }
@@ -109,20 +108,7 @@
       z-index: 100;
       opacity: .9;
       cursor: grabbing;
-    }
-    .card.falling {
-      animation: fall 1.4s cubic-bezier(.2,.8,.2,1) forwards;
-    }
-
-    @keyframes fall {
-      to {
-        transform: translateY(0) rotate(var(--rot));
-        opacity: 1;
-      }
-    }
-    @keyframes pulse {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+      box-shadow: 0 16px 32px rgba(0,0,0,.5);
     }
   </style>
 </head>
@@ -140,74 +126,116 @@
 
   <script>
     const suits = ['♠','♥','♦','♣'];
-    const ranks = ['A','K','Q','J','10','9','8','7'];
-    const deck = suits.flatMap(s => ranks.map(r => ({s, r, v: r+s})));
+    const ranks = ['7','8','9','J','Q','K','10','A'];
+    const deck = [];
+    for (const s of suits) for (const r of ranks) deck.push(r + s);
 
     const container = document.querySelector('.card-container');
-    const bodyRect = document.body.getBoundingClientRect();
+    const h1 = document.querySelector('h1');
+    const btn = document.querySelector('.btn');
+    const tabs = document.querySelector('.tabs');
+    const footer = document.querySelector('.footer');
 
-    // Spawn 12 cards
-    for (let i = 0; i < 12; i++) {
+    // Get bounding rects of UI elements (after DOM ready)
+    function getUIRects() {
+      return [
+        h1.getBoundingClientRect(),
+        btn.getBoundingClientRect(),
+        tabs.getBoundingClientRect(),
+        footer.getBoundingClientRect()
+      ];
+    }
+
+    function getViewport() {
+      return { w: window.innerWidth, h: window.innerHeight };
+    }
+
+    function isInUI(x, y, rects, cardW = 80, cardH = 110) {
+      const buffer = 20;
+      for (const r of rects) {
+        if (
+          x + cardW + buffer > r.left &&
+          x - buffer < r.right &&
+          y + cardH + buffer > r.top &&
+          y - buffer < r.bottom
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function createCard(delay) {
       const card = document.createElement('div');
       card.className = 'card';
-      const {v, s} = deck[Math.floor(Math.random()*deck.length)];
-      card.textContent = v;
-      if (['♥','♦'].includes(s)) card.classList.add('red');
+      const symbol = deck[Math.floor(Math.random() * deck.length)];
+      card.textContent = symbol;
+      if (symbol.includes('♥') || symbol.includes('♦')) card.classList.add('red');
 
-      // Random start X, offscreen top
-      const startX = Math.random() * (window.innerWidth - 100) + 50;
-      card.style.left = `${startX}px`;
-      card.style.top = `-200px`;
+      const vp = getViewport();
+      const cardW = 80;
+      const cardH = 110;
+      const uiRects = getUIRects();
 
-      // Random rotation
+      let left, targetY, attempts = 0;
+      do {
+        left = Math.random() * (vp.w - cardW);
+        targetY = Math.random() * (vp.h * 0.55) + vp.h * 0.15; // 15%–70% vertically
+        attempts++;
+      } while (isInUI(left, targetY, uiRects, cardW, cardH) && attempts < 50);
+
       const rot = Math.random() * 60 - 30;
-      card.style.setProperty('--rot', `${rot}deg`);
+
+      card.style.left = `${left}px`;
+      card.style.top = `-150px`;
 
       container.appendChild(card);
 
-      // Trigger fall after append
       setTimeout(() => {
-        card.classList.add('falling');
-      }, i * 150);
+        card.style.transition = 'top 1.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.3s ease-out, opacity 0.7s';
+        card.style.top = `${targetY}px`;
+        card.style.transform = `rotate(${rot}deg)`;
+        card.style.opacity = '1';
+      }, delay);
 
-      // Drag logic
-      let isDown = false;
-      let offset = {x: 0, y: 0};
-      let currentRot = rot;
+      // Drag & Drop
+      let dragging = false;
+      let offsetX, offsetY;
+      const currentRot = rot + 'deg';
 
       card.addEventListener('pointerdown', e => {
-        isDown = true;
+        dragging = true;
         card.classList.add('dragging');
         const rect = card.getBoundingClientRect();
-        offset.x = e.clientX - rect.left;
-        offset.y = e.clientY - rect.top;
-        card.setPointerCapture(e.pointerId);
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
         e.preventDefault();
       });
 
-      card.addEventListener('pointermove', e => {
-        if (!isDown) return;
-        const x = e.clientX - offset.x;
-        const y = e.clientY - offset.y;
+      document.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const x = e.clientX - offsetX;
+        const y = e.clientY - offsetY;
         card.style.left = `${x}px`;
         card.style.top = `${y}px`;
-        card.style.transform = `translate(0,0) rotate(${currentRot}deg)`;
+        card.style.transition = 'none';
+        card.style.transform = `rotate(${currentRot})`;
       });
 
-      card.addEventListener('pointerup', () => {
-        if (isDown) {
-          isDown = false;
+      document.addEventListener('pointerup', () => {
+        if (dragging) {
+          dragging = false;
           card.classList.remove('dragging');
         }
       });
-
-      card.addEventListener('pointercancel', () => {
-        isDown = false;
-        card.classList.remove('dragging');
-      });
     }
 
-    // Tab switching
+    // 9 cards, staggered 220ms
+    for (let i = 0; i < 9; i++) {
+      createCard(i * 220);
+    }
+
+    // Tabs
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -215,11 +243,14 @@
       });
     });
 
-    // Button pulse on click
-    document.querySelector('.btn').addEventListener('click', e => {
-      e.target.style.animation = 'pulse .6s';
-      setTimeout(() => e.target.style.animation = '', 600);
+    // Button pulse
+    btn.addEventListener('click', () => {
+      btn.style.transform = 'scale(1.05)';
+      setTimeout(() => btn.style.transform = '', 200);
     });
+
+    // Responsive: reload on resize to recalculate safe zones
+    window.addEventListener('resize', () => location.reload());
   </script>
 </body>
 </html>
