@@ -1,113 +1,112 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Belot Club – Cascade</title>
   <style>
     :root {
       --gold: #FFD700;
-      --amber: #FFA500;
-      --dark: #0F0F1A;
-      --navy: #1A1A2E;
-      --text: #FFF;
+      --orange: #FFA500;
+      --bg: #0F0F1A;
+      --dark: #1A1A2E;
+      --light: #FFF;
     }
-
     * { box-sizing: border-box; margin:0; padding:0; }
     body {
-      background: var(--dark);
-      color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-      min-height: 100dvh;
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
+      background: var(--bg);
+      color: var(--light);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      padding: clamp(16px, 4vw, 32px);
-      gap: 1.5rem;
+      min-height: 100vh;
+      padding: 16px;
+      overflow: hidden;
+      touch-action: none; /* Prevent scroll on drag */
     }
-
     h1 {
-      font-size: clamp(2rem, 8vw, 3.5rem);
-      font-weight: 900;
-      background: linear-gradient(45deg, var(--gold), var(--amber));
+      font-size: clamp(28px, 8vw, 48px);
+      background: linear-gradient(45deg, var(--gold), var(--orange));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      margin-bottom: 16px;
       text-align: center;
-      letter-spacing: 0.05em;
     }
-
     .btn {
       background: var(--gold);
       color: #000;
-      padding: clamp(12px, 3vw, 20px) clamp(24px, 6vw, 48px);
-      border-radius: 16px;
-      font-size: clamp(1.1rem, 4vw, 1.5rem);
-      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 600;
+      margin: 20px 0;
+      z-index: 10;
       cursor: pointer;
-      transition: transform .2s, box-shadow .2s;
-      align-self: center;
-      box-shadow: 0 8px 20px rgba(255,215,0,.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px rgba(255,215,0,0.4);
     }
-    .btn:active { transform: scale(.95); }
-
+    .btn:hover, .btn:active { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255,215,0,0.6); }
     .tabs {
       display: flex;
-      gap: 1rem;
-      justify-content: center;
+      gap: 12px;
+      z-index: 10;
       flex-wrap: wrap;
+      justify-content: center;
     }
     .tab {
-      padding: .75rem 1.5rem;
-      background: var(--navy);
-      border-radius: 2rem;
-      font-size: clamp(.9rem, 3vw, 1rem);
+      padding: 10px 20px;
+      background: var(--dark);
+      border-radius: 30px;
+      font-size: clamp(16px, 4vw, 18px);
+      transition: background 0.3s ease, transform 0.2s ease;
       cursor: pointer;
-      transition: all .3s;
-      white-space: nowrap;
     }
-    .tab.active { background: var(--gold); color: #000; }
-
+    .tab.active, .tab:hover {
+      background: linear-gradient(45deg, var(--gold), var(--orange));
+      color: #000;
+      transform: translateY(-2px);
+    }
     .footer {
-      font-size: .9rem;
-      opacity: .8;
+      margin-top: auto;
+      padding: 16px 0;
+      font-size: 14px;
+      z-index: 10;
       text-align: center;
+      opacity: 0.8;
     }
-
+    .card-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
     .card {
       position: absolute;
-      width: clamp(50px, 12vw, 80px);
-      height: clamp(70px, 16vw, 110px);
+      width: clamp(50px, 15vw, 80px);
+      height: auto;
+      aspect-ratio: 2 / 3;
       background: #FFF;
       color: #000;
-      border-radius: 10px;
-      font-size: clamp(2rem, 6vw, 3rem);
+      border-radius: 8px;
+      font-size: clamp(32px, 10vw, 48px);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,.4);
-      cursor: grab;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       user-select: none;
-      touch-action: none;
-      z-index: 5;
+      pointer-events: auto;
+      cursor: grab;
+      transition: transform 0.1s ease;
     }
     .card:active { cursor: grabbing; }
-    .card.dragging { z-index: 100; opacity: .9; }
-
+    .card.dragging { z-index: 20; transition: none; }
     @keyframes fall {
-      from { transform: translateY(-150vh) rotate(0deg); opacity: 0; }
-      to   { transform: translateY(0) rotate(var(--rot)); opacity: 1; }
+      0% { transform: translateY(-150%) rotate(-30deg); opacity: 0; }
+      100% { transform: translateY(0) rotate(0); opacity: 1; }
     }
-    @keyframes pulse {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
+    .falling { animation: fall 1.2s ease-out forwards; }
   </style>
 </head>
 <body>
   <h1>БЕЛОТ КЛУБ</h1>
-  <div class="btn">НОВА ИГРА</div>
+  <div class="btn" id="newGame">НОВА ИГРА</div>
   <div class="tabs">
     <div class="tab active">Приятели</div>
     <div class="tab">Клубове</div>
@@ -115,76 +114,91 @@
   </div>
   <div class="footer">Ad-Free • Learn & Earn +300</div>
 
+  <div class="card-container" id="cardContainer"></div>
+
   <script>
-    const suits = ['♠','♥','♦','♣'];
-    const ranks = ['A','K','Q','J','10','9','8','7'];
-    const deck = suits.flatMap(s => ranks.map(r => ({s, r, v: r+s})));
-
-    // Spawn 12 draggable cards
-    for (let i = 0; i < 12; i++) {
-      const card = document.createElement('div');
-      card.className = 'card';
-      const {v} = deck[Math.floor(Math.random()*deck.length)];
-      card.textContent = v;
-      card.dataset.suit = v[1];
-      card.style.color = ['♥','♦'].includes(v[1]) ? '#C00' : '#000';
-
-      // Random start position
-      card.style.left = `${Math.random()*80 + 10}vw`;
-      card.style.top = `-150px`;
-
-      // Final landing
-      const rot = Math.random()*60 - 30;
-      card.style.setProperty('--rot', `${rot}deg`);
-
-      document.body.appendChild(card);
-
-      // Fall animation
-      setTimeout(() => {
-        card.style.transition = 'none';
-        card.offsetHeight; // reflow
-        card.style.transition = 'transform 1.2s cubic-bezier(.2,.8,.2,1), opacity .6s';
-        card.style.transform = `translateY(0) rotate(${rot}deg)`;
-        card.style.opacity = '1';
-        card.style.animation = 'fall 1.2s cubic-bezier(.2,.8,.2,1) forwards';
-      }, i * 120);
-
-      // Drag logic
-      let pos = {x:0, y:0}, offset = {x:0, y:0}, isDown = false;
-      card.addEventListener('pointerdown', e => {
-        isDown = true;
-        card.classList.add('dragging');
-        const rect = card.getBoundingClientRect();
-        offset.x = e.clientX - rect.left;
-        offset.y = e.clientY - rect.top;
-        card.setPointerCapture(e.pointerId);
-      });
-      card.addEventListener('pointermove', e => {
-        if (!isDown) return;
-        pos.x = e.clientX - offset.x;
-        pos.y = e.clientY - offset.y;
-        card.style.left = `${pos.x}px`;
-        card.style.top  = `${pos.y}px`;
-        card.style.transform = `translate(0,0) rotate(${rot}deg)`;
-      });
-      card.addEventListener('pointerup', () => {
-        isDown = false;
-        card.classList.remove('dragging');
-      });
-    }
+    // Core lobby logic – responsive, interactive, performant
+    const cards = ['🂡','🂱','🃁','🃑','🂢','🂲','🃂','🃒'];
+    const container = document.getElementById('cardContainer');
+    const tabs = document.querySelectorAll('.tab');
+    let selectedTab = tabs[0];
 
     // Tab switching
-    document.querySelectorAll('.tab').forEach(t => {
-      t.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-        t.classList.add('active');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        selectedTab.classList.remove('active');
+        tab.classList.add('active');
+        selectedTab = tab;
+        // Future: Load content via fetch('/api/' + tab.textContent)
+        spawnCards(); // Refresh animation on tab change
       });
     });
 
-    // Button pulse
-    document.querySelector('.btn').addEventListener('pointerdown', e => {
-      e.target.style.animation = 'pulse .6s';
-      setTimeout(() => e.target.style.animation = '', 600);
+    // New Game button pulse
+    const newGameBtn = document.getElementById('newGame');
+    newGameBtn.addEventListener('click', () => {
+      alert('Създаване на нова игра... (placeholder)');
+      // Future: Navigate to game room
+    });
+    setInterval(() => newGameBtn.style.transform = 'scale(1.03)', 2000);
+
+    // Spawn falling + draggable cards
+    function spawnCards() {
+      container.innerHTML = ''; // Clear for fresh spawn
+      cards.forEach((c, i) => {
+        const card = document.createElement('div');
+        card.className = 'card falling';
+        card.textContent = c;
+        card.style.left = `${Math.random() * 80 + 10}%`;
+        card.style.top = '-150px';
+        card.style.animationDelay = `${i * 150}ms`;
+        container.appendChild(card);
+
+        // Drag logic
+        let pos = { x: 0, y: 0 }, offset = { x: 0, y: 0 }, isDragging = false;
+        const onMove = (e) => {
+          if (!isDragging) return;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          pos.x = clientX - offset.x;
+          pos.y = clientY - offset.y;
+          card.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.x / 20}deg)`;
+          card.classList.add('dragging');
+        };
+        const startDrag = (e) => {
+          e.preventDefault();
+          isDragging = true;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const rect = card.getBoundingClientRect();
+          offset.x = clientX - rect.left - rect.width / 2;
+          offset.y = clientY - rect.top - rect.height / 2;
+          card.style.transition = 'none';
+        };
+        const endDrag = () => {
+          isDragging = false;
+          card.classList.remove('dragging');
+          card.style.transition = 'transform 0.3s ease';
+        };
+
+        card.addEventListener('mousedown', startDrag);
+        card.addEventListener('touchstart', startDrag, { passive: false });
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+      });
+    }
+
+    // Initial spawn + auto-refresh every 15s for dynamic lobby feel
+    spawnCards();
+    setInterval(spawnCards, 15000);
+
+    // Responsive resize handler
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.card').forEach(c => {
+        c.style.left = `${Math.random() * 80 + 10}%`;
+      });
     });
   </script>
 </body>
