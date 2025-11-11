@@ -100,8 +100,8 @@ function createCard(delay) {
   });
 }
 
-// 9 cards
-for (let i = 0; i < 9; i++) createCard(i * 220);
+// 11 cards
+for (let i = 0; i < 11; i++) createCard(i * 50);
 
 // Tabs
 document.querySelectorAll('.tab').forEach(tab => {

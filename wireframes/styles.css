@@ -20,6 +20,7 @@
       gap: 1.5rem;
       position: relative;
       overflow: visible;
+      touch-action: none;
     }
 
     h1 {
